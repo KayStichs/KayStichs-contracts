@@ -1,4 +1,5 @@
 #![no_std]
+use reward_pool::RewardPoolClient;
 use soroban_sdk::{contract, contractevent, contractimpl, Address, BytesN, Env};
 
 pub mod types;
@@ -6,6 +7,8 @@ use types::{Course, DataKey};
 
 #[contract]
 pub struct CourseRegistry;
+
+const COURSE_COMPLETION_REWARD: i128 = 10_0000000;
 
 #[contractevent]
 pub struct MetadataUpdated {
@@ -236,7 +239,13 @@ impl CourseRegistry {
 
     /// Records a learner's completion of a module after off-chain quiz validation.
     /// Only callable by the authorized verifier (protocol admin).
-    pub fn complete_module(env: Env, verifier: Address, learner: Address, id: u32) {
+    pub fn complete_module(
+        env: Env,
+        verifier: Address,
+        learner: Address,
+        id: u32,
+        reward_pool_address: Address,
+    ) {
         // 1. Authenticate the verifier's signature
         verifier.require_auth();
 
@@ -278,6 +287,15 @@ impl CourseRegistry {
         env.storage()
             .persistent()
             .set(&DataKey::Progress(learner.clone(), id), &new_progress);
+
+        if new_progress == course.total_modules {
+            let reward_pool = RewardPoolClient::new(&env, &reward_pool_address);
+            reward_pool.distribute_reward(
+                &env.current_contract_address(),
+                &learner,
+                &COURSE_COMPLETION_REWARD,
+            );
+        }
 
         // 8. Emit ModuleCompleted event
         ModuleCompleted {

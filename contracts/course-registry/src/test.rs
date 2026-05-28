@@ -2,10 +2,11 @@
 
 use soroban_sdk::{
     testutils::{Address as _, Events},
-    Address, BytesN, Env,
+    token, Address, BytesN, Env,
 };
 
 use crate::{CourseRegistry, CourseRegistryClient, DataKey};
+use reward_pool::{RewardPool, RewardPoolClient};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -19,6 +20,17 @@ fn setup() -> (Env, CourseRegistryClient<'static>) {
 
 fn dummy_hash(env: &Env) -> BytesN<32> {
     BytesN::from_array(env, &[1u8; 32])
+}
+
+fn setup_reward_pool(env: &Env, admin: &Address, spender: &Address) -> (Address, Address) {
+    let token_id = env.register_stellar_asset_contract_v2(admin.clone());
+    let reward_pool_id = env.register(RewardPool, ());
+    let reward_pool = RewardPoolClient::new(env, &reward_pool_id);
+
+    reward_pool.initialize(admin, &token_id.address());
+    reward_pool.add_approved_spender(admin, spender);
+
+    (reward_pool.address.clone(), token_id.address())
 }
 
 /// Seeds an initialized contract with one course and returns (admin, instructor, course_id).
@@ -426,9 +438,12 @@ fn test_complete_module_increments_progress() {
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    let (reward_pool_address, token_address) = setup_reward_pool(&env, &admin, &client.address);
+    let token_client = token::StellarAssetClient::new(&env, &token_address);
+    token_client.mint(&reward_pool_address, &20_0000000);
 
     // Complete first module
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
 }
 
 #[test]
@@ -440,8 +455,9 @@ fn test_complete_module_emits_event() {
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    let (reward_pool_address, _) = setup_reward_pool(&env, &admin, &client.address);
 
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
 
     // Verify event was emitted
     assert_eq!(env.events().all().len(), 1);
@@ -456,11 +472,16 @@ fn test_complete_module_multiple_times() {
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    let (reward_pool_address, token_address) = setup_reward_pool(&env, &admin, &client.address);
+    let token_client = token::StellarAssetClient::new(&env, &token_address);
+    token_client.mint(&reward_pool_address, &20_0000000);
 
     // Complete all three modules
-    client.complete_module(&admin, &learner, &course_id);
-    client.complete_module(&admin, &learner, &course_id);
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
+
+    assert_eq!(token_client.balance(&learner), 10_0000000);
 }
 
 #[test]
@@ -473,13 +494,18 @@ fn test_complete_module_exceeds_total_modules() {
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &2, &dummy_hash(&env));
+    let (reward_pool_address, token_address) = setup_reward_pool(&env, &admin, &client.address);
+    let token_client = token::StellarAssetClient::new(&env, &token_address);
+    token_client.mint(&reward_pool_address, &20_0000000);
 
     // Complete both modules
-    client.complete_module(&admin, &learner, &course_id);
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
+
+    assert_eq!(token_client.balance(&learner), 10_0000000);
 
     // This should panic - trying to complete a third module when only 2 exist
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
 }
 
 #[test]
@@ -490,12 +516,13 @@ fn test_complete_module_unauthorized_verifier() {
     let fake_verifier = Address::generate(&env);
     let instructor = Address::generate(&env);
     let learner = Address::generate(&env);
+    let (reward_pool_address, _) = setup_reward_pool(&env, &admin, &client.address);
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
 
     // Should fail - fake_verifier is not the admin
-    client.complete_module(&fake_verifier, &learner, &course_id);
+    client.complete_module(&fake_verifier, &learner, &course_id, &reward_pool_address);
 }
 
 #[test]
@@ -504,11 +531,12 @@ fn test_complete_module_nonexistent_course() {
     let (env, client) = setup();
     let admin = Address::generate(&env);
     let learner = Address::generate(&env);
+    let (reward_pool_address, _) = setup_reward_pool(&env, &admin, &client.address);
 
     client.initialize(&admin);
 
     // Should fail - course 99 doesn't exist
-    client.complete_module(&admin, &learner, &99);
+    client.complete_module(&admin, &learner, &99, &reward_pool_address);
 }
 
 #[test]
@@ -518,14 +546,15 @@ fn test_complete_module_different_learners() {
     let instructor = Address::generate(&env);
     let learner1 = Address::generate(&env);
     let learner2 = Address::generate(&env);
+    let (reward_pool_address, _) = setup_reward_pool(&env, &admin, &client.address);
 
     client.initialize(&admin);
     let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
 
     // Both learners can progress independently
-    client.complete_module(&admin, &learner1, &course_id);
-    client.complete_module(&admin, &learner2, &course_id);
-    client.complete_module(&admin, &learner1, &course_id);
+    client.complete_module(&admin, &learner1, &course_id, &reward_pool_address);
+    client.complete_module(&admin, &learner2, &course_id, &reward_pool_address);
+    client.complete_module(&admin, &learner1, &course_id, &reward_pool_address);
 }
 
 #[test]
@@ -548,18 +577,19 @@ fn test_get_progress_tracks_completion() {
     let admin = Address::generate(&env);
     let instructor = Address::generate(&env);
     let learner = Address::generate(&env);
+    let reward_pool_address = Address::generate(&env);
 
     client.initialize(&admin);
-    let course_id = client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    let course_id = client.create_course(&admin, &instructor, &4, &dummy_hash(&env));
 
     assert_eq!(client.get_progress(&learner, &course_id), 0);
 
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
     assert_eq!(client.get_progress(&learner, &course_id), 1);
 
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
     assert_eq!(client.get_progress(&learner, &course_id), 2);
 
-    client.complete_module(&admin, &learner, &course_id);
+    client.complete_module(&admin, &learner, &course_id, &reward_pool_address);
     assert_eq!(client.get_progress(&learner, &course_id), 3);
 }
