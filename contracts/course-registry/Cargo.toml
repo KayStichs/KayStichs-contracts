@@ -13,6 +13,7 @@ doctest = false
 
 [dependencies]
 soroban-sdk = { workspace = true }
+reward-pool = { path = "../reward-pool" }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }

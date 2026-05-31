@@ -6,6 +6,8 @@ use soroban_sdk::{
 };
 
 use crate::{CourseRegistry, CourseRegistryClient, DataKey};
+use reward_pool::RewardPoolClient;
+use soroban_sdk::token;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -562,4 +564,87 @@ fn test_get_progress_tracks_completion() {
 
     client.complete_module(&admin, &learner, &course_id);
     assert_eq!(client.get_progress(&learner, &course_id), 3);
+}
+
+#[test]
+fn test_complete_module_triggers_reward_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    // Register CourseRegistry
+    let cr_contract_id = env.register(CourseRegistry, ());
+    let cr_client = CourseRegistryClient::new(&env, &cr_contract_id);
+
+    // Register RewardPool
+    let rp_contract_id = env.register(reward_pool::RewardPool, ());
+    let rp_client = RewardPoolClient::new(&env, &rp_contract_id);
+
+    let admin = Address::generate(&env);
+    let instructor = Address::generate(&env);
+    let learner = Address::generate(&env);
+
+    // Create a mock token and initialize reward pool
+    let token_id = env.register_stellar_asset_contract_v2(admin.clone());
+    cr_client.initialize(&admin);
+    rp_client.initialize(&admin, &token_id.address());
+
+    // Set reward pool address on CourseRegistry and whitelist CourseRegistry in RewardPool
+    cr_client.set_reward_pool(&admin, &rp_client.address);
+    rp_client.add_approved_spender(&admin, &cr_client.address);
+
+    // Create course and enroll learner
+    let course_id = cr_client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    cr_client.enroll(&learner, &course_id);
+
+    // Fund reward pool with tokens
+    let token_client = token::StellarAssetClient::new(&env, &token_id.address());
+    token_client.mint(&rp_client.address, &100000000i128);
+
+    // Complete modules - final completion should trigger distribution
+    cr_client.complete_module(&admin, &learner, &course_id);
+    cr_client.complete_module(&admin, &learner, &course_id);
+    cr_client.complete_module(&admin, &learner, &course_id);
+
+    // Verify learner received base reward (10_0000000)
+    assert_eq!(token_client.balance(&learner), 10_0000000i128);
+}
+
+#[test]
+#[should_panic(expected = "Caller is not an authorized spender")]
+fn test_complete_module_fails_when_not_whitelisted() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    // Register CourseRegistry
+    let cr_contract_id = env.register(CourseRegistry, ());
+    let cr_client = CourseRegistryClient::new(&env, &cr_contract_id);
+
+    // Register RewardPool
+    let rp_contract_id = env.register(reward_pool::RewardPool, ());
+    let rp_client = RewardPoolClient::new(&env, &rp_contract_id);
+
+    let admin = Address::generate(&env);
+    let instructor = Address::generate(&env);
+    let learner = Address::generate(&env);
+
+    // Create a mock token and initialize reward pool
+    let token_id = env.register_stellar_asset_contract_v2(admin.clone());
+    cr_client.initialize(&admin);
+    rp_client.initialize(&admin, &token_id.address());
+
+    // Set reward pool address on CourseRegistry but DO NOT whitelist CourseRegistry in RewardPool
+    cr_client.set_reward_pool(&admin, &rp_client.address);
+
+    // Create course and enroll learner
+    let course_id = cr_client.create_course(&admin, &instructor, &3, &dummy_hash(&env));
+    cr_client.enroll(&learner, &course_id);
+
+    // Fund reward pool with tokens
+    let token_client = token::StellarAssetClient::new(&env, &token_id.address());
+    token_client.mint(&rp_client.address, &100000000i128);
+
+    // Complete modules - final completion should attempt distribution and panic
+    cr_client.complete_module(&admin, &learner, &course_id);
+    cr_client.complete_module(&admin, &learner, &course_id);
+    cr_client.complete_module(&admin, &learner, &course_id);
 }

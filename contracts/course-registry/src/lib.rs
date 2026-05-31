@@ -3,6 +3,7 @@ use soroban_sdk::{contract, contractevent, contractimpl, Address, BytesN, Env};
 
 pub mod types;
 use types::{Course, DataKey};
+use reward_pool::RewardPoolClient;
 
 #[contract]
 pub struct CourseRegistry;
@@ -188,6 +189,22 @@ impl CourseRegistry {
         CourseStatusChanged { id, active }.publish(&env);
     }
 
+    /// Sets the RewardPool contract address. Only callable by the Protocol Admin.
+    pub fn set_reward_pool(env: Env, admin: Address, reward_pool: Address) {
+        admin.require_auth();
+
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .expect("Contract not initialized");
+        assert!(admin == stored_admin, "Unauthorized: Caller is not the protocol admin");
+
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardPool, &reward_pool);
+    }
+
     /// Returns true if the learner has completed all modules in the course.
     pub fn is_course_finished(env: Env, learner: Address, id: u32) -> bool {
         let course: Course = env
@@ -281,11 +298,27 @@ impl CourseRegistry {
 
         // 8. Emit ModuleCompleted event
         ModuleCompleted {
-            learner,
+            learner: learner.clone(),
             course_id: id,
             new_progress,
         }
         .publish(&env);
+        // 9. If learner finished the course, trigger reward distribution
+        if new_progress == course.total_modules {
+            // Fetch RewardPool address from instance storage
+            let reward_pool_addr: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::RewardPool)
+                .expect("RewardPool not set");
+
+            let reward_pool = RewardPoolClient::new(&env, &reward_pool_addr);
+
+            // Base reward in token's smallest unit (e.g., 10 USDC)
+            let base_reward: i128 = 10_0000000;
+
+            reward_pool.distribute_reward(&env.current_contract_address(), &learner, &base_reward);
+        }
     }
 }
 
