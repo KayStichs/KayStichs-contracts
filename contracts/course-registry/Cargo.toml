@@ -17,4 +17,5 @@ reward-pool = { path = "../reward-pool" }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
+badge-nft = { path = "../badge-nft", features = ["testutils"] }
 
