@@ -16,5 +16,5 @@ pub enum DataKey {
     Progress(Address, u32),
     CourseCount,
     Admin,
-        RewardPool,
+    RewardPool,
 }
