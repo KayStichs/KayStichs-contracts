@@ -37,7 +37,7 @@ jobs:
           workspaces: "./contracts"
 
       - name: Install Stellar CLI
-        uses: stellar/stellar-cli@v23.0.1
+        uses: stellar/stellar-cli@v23.3.0
 
       - name: Check formatting
         run: cargo fmt --all -- --check
