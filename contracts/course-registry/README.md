@@ -16,65 +16,46 @@ Deactivated courses remain in storage so past learners keep their credentials, b
 
 ### Core Functions
 
-#### `create_course(env: Env, admin: Address, id: u32, title: Symbol) -> Symbol`
+| Function | Purpose |
+|---|---|
+| `initialize(admin)` | One-shot; registers the protocol admin. |
+| `set_reward_pool_address(admin, addr)` | Sets the **RewardPool** contract address. |
+| `set_badge_nft_address(admin, addr)` | Sets the **BadgeNFT** contract address. |
+| `create_course(admin, instructor, total_modules, metadata_hash)` | Allocates a new course id + record; emits `CourseCreated`. |
+| `update_metadata(id, new_hash)` | Instructor-only — bumps the IPFS hash. |
+| `enroll(learner, id)` | Initializes progress to 0; panics if not active or already enrolled. |
+| `course_count()` | Total number of courses registered so far. |
+| `set_course_status(admin, id, active)` | Admin-only — toggles the active flag. |
+| `is_course_finished(learner, id)` | Pure boolean read; `progress >= total_modules`. |
+| `get_course(id)` | Returns the full `Course` struct. |
+| `get_progress(learner, id)` | Returns `0u32` if not enrolled. |
+| `transfer_ownership(current_instructor, new_instructor, course_id)` | Instructor-only. |
+| `complete_module(verifier, learner, id)` | Bumps progress; on final module, mints badge + distributes reward. |
+| `upgrade_contract(admin, new_wasm_hash)` | Admin-only — wasm upgrade hook. |
 
-Creates a new course in the registry.
+#### Example: full learner journey
 
-**Parameters:**
-- `env`: The Soroban environment
-- `admin`: The admin address performing the action (must be authenticated)
-- `id`: Unique course identifier
-- `title`: Course title (Symbol, max 9 characters)
-
-**Returns:** `"success"` symbol on successful creation
-
-**Events:** Emits `CourseCreated` event with admin and title
-
-**Example:**
 ```rust
-let result = client.create_course(&admin, &1u32, &symbol_short!("Rust101"));
-```
+let admin = Address::generate(&env);
+client.initialize(&admin);
 
-#### `set_course_status(env: Env, admin: Address, id: u32, active: bool) -> Symbol`
+// Wire downstream contracts.
+client.set_reward_pool_address(&admin, &reward_pool_id);
+client.set_badge_nft_address(&admin, &badge_nft_id);
 
-Updates the active status of a course.
+// Create a 3-module course.
+let course_id = client.create_course(
+    &admin,
+    &instructor,
+    &3u32,
+    &BytesN::from_array(&env, &[0u8; 32]),
+);
 
-**Parameters:**
-- `env`: The Soroban environment
-- `admin`: The admin address performing the action (must be authenticated)
-- `id`: Course ID to update
-- `active`: New status (true = active, false = deactivated)
-
-**Returns:** `"success"` symbol on successful update
-
-**Events:** Emits `status` event with admin and status ("active" or "inactive")
-
-**Panics:** If course does not exist
-
-**Example:**
-```rust
-// Deactivate a course
-let result = client.set_course_status(&admin, &1u32, &false);
-
-// Reactivate a course
-let result = client.set_course_status(&admin, &1u32, &true);
-```
-
-#### `get_course(env: Env, id: u32) -> (u32, Symbol, bool)`
-
-Retrieves course information from the registry.
-
-**Parameters:**
-- `env`: The Soroban environment
-- `id`: Course ID to retrieve
-
-**Returns:** Tuple of (id, title, active)
-
-**Panics:** If course does not exist
-
-**Example:**
-```rust
-let (id, title, active) = client.get_course(&1u32);
+// Enroll + complete each module.
+client.enroll(&learner, &course_id);
+client.complete_module(&admin, &learner, &course_id);  // 1/N
+client.complete_module(&admin, &learner, &course_id);  // 2/N
+client.complete_module(&admin, &learner, &course_id);  // 3/N → badge + reward
 ```
 
 ## Storage
