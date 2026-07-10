@@ -1,0 +1,39 @@
+{
+  "$schema": "https://kaystichs.dev/schemas/wasm-info-v1.json",
+  "brand": {
+    "name": "KayStichs",
+    "slug": "kaystichs",
+    "reserve_casing": "KAYSTICHS",
+    "version": "1.0.0",
+    "repository": "kaystichs/kaystichs-contracts"
+  },
+  "workspace": {
+    "root": "contracts/",
+    "members": [
+      "course-registry",
+      "quest-engine",
+      "reward-pool",
+      "badge-nft",
+      "governance",
+      "stake-vault"
+    ],
+    "soroban_sdk": "23"
+  },
+  "build": {
+    "target": "wasm32-unknown-unknown",
+    "release_target": "wasm32v1-none",
+    "tool": "stellar contract build",
+    "tool_version": ">=v23.0.1"
+  },
+  "ci": {
+    "formatting": "cargo fmt --all -- --check",
+    "linting": "cargo clippy --all-targets --all-features -- -D warnings",
+    "tests": "cargo test",
+    "rebrand_verification": "scripts/verify-rebrand.sh"
+  },
+  "brand_assets": {
+    "primary_color": "#4F46E5",
+    "accent_color": "#F43F5E",
+    "primary_dark": "#1E1B4B"
+  }
+}
