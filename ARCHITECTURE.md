@@ -181,4 +181,52 @@ are expected to size bounties conservatively until the boost overflow rules are 
 
 ---
 
+## Upgrade Mechanics
+
+Every contract exposes `upgrade_contract(admin, new_wasm_hash)`. The flow is:
+
+```text
+Admin off-chain              Contract (on-chain)
+  │                                │
+  │ 1. Build new wasm offline      │
+  │ 2. Upload hash via Stellar CLI │
+  ├───────────────────────────────►│
+  │                                │ 3. require_auth on admin
+  │                                │ 4. assert admin == stored admin
+  │                                │ 5. deployer.update_current_contract_wasm(new)
+  │                                │ 6. emit ContractUpgraded event
+```
+
+**Confirmation:** always subscribe to `ContractUpgraded` events across all six
+contracts and alert on drift. Indexers MUST treat the event as the *only* signal
+that wasm changed.
+
+### Why `BytesN<32>` and not `String` for the hash?
+
+The wasm hash is fixed-width 32 bytes for a reason — Soroban's `deployer` API
+expects it. Provide it via off-chain tooling (e.g. `stellar contract upload`
+returns the hash you want to pass in).
+
+---
+
+## Error Reference
+
+| Panic message                                  | Where                                    | Meaning                                                |
+|------------------------------------------------|------------------------------------------|--------------------------------------------------------|
+| `Already initialized`                           | every `initialize(...)`                  | Called twice; second call reverts.                     |
+| `Contract not initialized` / `Not initialized` | most state-changing calls                | Instance `Admin` (or similar) absent.                  |
+| `Unauthorized` / `Unauthorized: ...`           | any admin-gated call                     | Caller's address ≠ stored admin.                       |
+| `Amount must be positive`                       | `reward_pool.distribute_reward`, `stake_vault.stake` | `amount <= 0`.                                |
+| `Caller is not an authorized spender`          | `reward_pool.distribute_reward`          | Spender whitelist missing the caller.                 |
+| `Contract is paused`                            | `reward_pool.distribute_reward`, `quest-engine.review_submission`, `quest-engine.batch_review_submissions` | Admin toggled pause. |
+| `Lock period active`                            | `stake_vault.unstake`                    | Less than 604 800 s (~7 days) since last stake.        |
+| `Course already completed`                      | `course_registry.complete_module`        | `progress >= total_modules`.                            |
+| `Learner already enrolled`                      | `course_registry.enroll`                 | Duplicate `Progress(learner, id)` key.                 |
+| `Submission is not pending review`              | `quest-engine.review_submission`         | Status != Pending.                                     |
+| `Voting still active` / `Voting ended`         | `governance.execute_proposal` / `cancel_proposal` | Timestamp conditions not met.                  |
+
+> Anything not in the table above is a bug — please open an issue.
+
+---
+
 *For deployment specifics, see [`DEPLOYMENT.md`](./DEPLOYMENT.md). For threat model, see [`SECURITY.md`](./SECURITY.md).*
