@@ -1,12 +1,29 @@
 # Rust's output directory
 target
 
-# Cargo lock file
-Cargo.lock
+# Cargo lock file (workspace-root Cargo.lock IS committed;
+# contracts/Cargo.lock IS committed per Stellar docs).
+# DO NOT add `Cargo.lock` here.
 
 # Local settings
 .soroban
 .stellar
 
+# Generated client bindings (kept out of source control to avoid churn)
+bindings/
+clients/
+sdk/
+
 # IDE settings
 .vscode/
+.idea/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Logs / temporary scratch
+*.log
+*.tmp
+.env
+.env.local
