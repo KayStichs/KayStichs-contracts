@@ -104,4 +104,23 @@ If a release has a critical flaw:
 
 ---
 
+## Breaking-change discipline
+
+A breaking change is any of:
+
+- Removal of a public function from a contract surface.
+- Renaming an event topic.
+- Changing the shape of an event's *data* field.
+- Changing the panic message that downstream code matches on
+  (`#[should_panic(expected = "...")]` will then fail).
+
+If your PR introduces any of those, you **must**:
+
+1. Bump the contract's `version` minor (or major).
+2. Update [`ROADMAP.md`](./ROADMAP.md) to reflect the change.
+3. Update [`CHANGELOG.md`](./CHANGELOG.md) with the breaking-callout banner.
+4. Coordinate with the indexer team — they treat topic-shapes as a contract.
+
+---
+
 *Anyone with merge rights can drive a release — please coordinate in `#releases` first.*
