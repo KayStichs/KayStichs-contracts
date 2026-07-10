@@ -1,0 +1,35 @@
+# `rustfmt` configuration for the KayStichs Protocol contracts workspace.
+#
+# This file pins the formatting choices used by `cargo fmt --all -- --check`
+# in CI. Local edits should never diverge from this; if you need a different
+# value, open a `chore:` PR with rationale.
+
+# Use spaces, four-wide indent — matches the existing lib.rs / test.rs files.
+indent_style           = "Spaces"
+indent_width           = 4
+
+# Permit (but discourage) tabs in generated bindings.
+use_small_heuristics   = "Default"
+
+# Group imports: std -> external -> soroban_sdk -> local.
+imports_granularity    = "Module"
+group_imports          = "StdExternalCrate"
+reorder_imports        = true
+
+# Wrap long lines at 100 chars; matches the existing source.
+max_width              = 100
+
+# Chain format-style for `.await?` and `.expect(...)`.
+chain_one_line_max     = 80
+conditional_new_style  = "Always"
+
+# Comments are condensed when too long.
+format_code_in_doc_comments = false
+wrap_comments          = true
+comment_width          = 100
+
+# Keep single-statement ifs on one line — already the project's idiom.
+single_line_if_else_max = 0
+
+# Show resolved paths in docs consistently (helps auditor grep).
+normalize_doc_attributes = true
