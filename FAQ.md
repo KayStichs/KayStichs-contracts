@@ -72,4 +72,32 @@ See [`SECURITY.md` §Disclosure Process](./SECURITY.md#disclosure-process) — f
 
 ---
 
+## Integrations
+
+### How do I get an up-to-date list of events?
+
+Every contract defines its events with `#[contractevent]`. After a `stellar
+contract build`, you can also dump them mechanically with:
+
+```bash
+stellar contract events --wasm <path>.wasm
+```
+
+### Can I read more than one contract's state in a single transaction?
+
+No — Soroban transactions are single-contract. To compose reads across
+contracts you must either:
+
+- Run a read-only off-chain aggregator that polls each contract, or
+- Wire a coordinator contract that calls each one and emits a summary event.
+
+### Are these contracts upgrade-safe on Testnet?
+
+Yes — every contract exposes `upgrade_contract(admin, new_wasm_hash)`. On
+Testnet, the canonical administration multisig is the `admin`; on
+Mainnet this is locked to a governance-approved address only after the
+audit sign-off documented in [`RELEASING.md`](./RELEASING.md).
+
+---
+
 *Have a question that's not here? File it as a new `docs` issue and we'll grow this list.*
