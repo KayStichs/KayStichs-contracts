@@ -66,4 +66,19 @@ We will **not** in 2026–2027:
 
 ---
 
+## Milestone Cadence
+
+| Quarter | Planned major work                                                  |
+|---------|---------------------------------------------------------------------|
+| 2026-Q3 | `reward-pool` per-spender caps; `governance.create_proposal` (v1.1). |
+| 2026-Q4 | On-chain proposal execution hooks; cross-crate snapshot testing.    |
+| 2027-Q1 | Multi-currency reward pools (basket SAC).                           |
+| 2027-Q2 | Cross-chain credential relay; `soulbound-reputation` derived from `minted_at`. |
+
+> A milestone migrates *between* buckets when scope changes. A bump from
+> `Later` to `Next` must be approved by at least one CODEOWNER before
+> the change lands in `ROADMAP.md`.
+
+---
+
 *Anyone can open a `roadmap` PR proposing changes — please include a section under "Why deferred" or "Anti-roadmap" when downgrading a candidate.*
