@@ -73,4 +73,19 @@ This rebrand was adopted after the workspace migrated off `Learnault`. The migra
 
 ---
 
+## Usage Do / Don't
+
+| ✅ DO                                                             | ❌ DON'T                                                          |
+|-------------------------------------------------------------------|--------------------------------------------------------------------|
+| `KayStichs Protocol` in public-facing titles                      | `Learnault` anywhere except `BRANDING.md`, `CHANGELOG.md` migration notes, or audit history |
+| `kaystichs/kaystichs-contracts` in URLs and CI labels             | `kaystichs_contracts` (underscored) anywhere                        |
+| `KayStichs Team` in `Cargo.toml` `authors` arrays                 | Personal email addresses in `authors`                              |
+| Headline color `#4F46E5` (indigo) + accent `#F43F5E` (rose)       | Mixing in legacy red/blue palette tokens                           |
+| Reserve casing `KAYSTICHS` only in machine-generated artifacts   | Using `KAYSTICHS` in human prose                                   |
+
+A patch that violates any of the ❌ column is **a brand PR**, not just a code PR —
+include a §Usage Do / Don't audit in the diff and ensure the verifier script is green.
+
+---
+
 *This file is the canonical contract for brand identity. If reality disagrees with this file, reality wins — but the next PR must reconcile.*
