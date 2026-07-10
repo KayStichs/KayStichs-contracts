@@ -1,3 +1,18 @@
+//! # `stake-vault` — Time-Locked Stake → Multi-Tier Multiplier
+//!
+//! Learners stake a single **SAC staking token** (KAYSTICHS on testnet)
+//! into the vault and receive one of three reward multipliers:
+//!
+//! | Stake amount       | Multiplier | Notes                |
+//! |--------------------|-----------|----------------------|
+//! | `>= 500`           | `200`     | 2.0 × boost (top)    |
+//! | `>= 100`           | `120`     | 1.2 × boost (mid)    |
+//! | `< 100`            | `100`     | 1.0 × (no boost)     |
+//!
+//! The 7-day lock (`604 800 s`) is **reset** on every stake-write; the
+//! contract deliberately has no early-unlock function.
+//!
+//! Read [`crate::types`] for the storage shapes.
 #![no_std]
 use soroban_sdk::{contract, contractevent, contractimpl, token, Address, BytesN, Env};
 
