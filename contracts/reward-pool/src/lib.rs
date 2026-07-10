@@ -1,3 +1,22 @@
+//! # `reward-pool` — Whitelisted Payout Vault
+//!
+//! `reward-pool` is the **treasury primitive** of the KayStichs Protocol.
+//! It holds a single SAC token (USDC on testnet) and pays it out to
+//! learners when called by an authorized spender contract.
+//!
+//! ## Design properties
+//!
+//! - **Spender whitelist.** Only contracts registered via
+//!   [`add_approved_spender`] can call [`distribute_reward`].
+//! - **Pause-aware.** Pause is checked *before* any state mutation, so a
+//!   paused pool cannot leak funds even via in-flight spender calls.
+//! - **Emergency sweep.** [`emergency_sweep`] drains the entire token
+//!   balance into a recovery wallet in one call — by design, for speed
+//!   under incident response.
+//! - **Endowment-friendly.** Anyone (signed) can call [`fund_pool`] to
+//!   top up the pool.
+//!
+//! See [`crate::types`] for [`DataKey`](types::DataKey).
 #![no_std]
 use soroban_sdk::{contractclient, contractevent, Address, BytesN, Env};
 
