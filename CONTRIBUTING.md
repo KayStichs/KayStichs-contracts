@@ -119,6 +119,31 @@ Or the entire workflow via `scripts/`:
 4. Add tests in `src/test.rs` of the same crate.
 5. Update the relevant README and `ARCHITECTURE.md` event / function lists.
 
+### Rustdoc minimum standard
+
+Every new *public* function in a contract MUST have:
+
+```rust
+/// One-line summary.
+///
+/// # Arguments
+/// * `param_name` - what it represents
+///
+/// # Returns
+/// What the function returns (omit if void).
+///
+/// # Panics
+/// Conditions that trigger a panic + the literal message.
+///
+/// # Events
+/// Which event(s) this function emits (omit if none).
+pub fn foo(...) { ... }
+```
+
+Use `cargo doc --workspace --no-deps --open` locally to preview.
+
+---
+
 ## Adding a New Contract
 
 1. Create `contracts/<your-contract>/` with the standard sub-tree (`src/lib.rs`, `src/types.rs`, `src/test.rs`, `Cargo.toml`, `Makefile`, `README.md`).
@@ -126,6 +151,18 @@ Or the entire workflow via `scripts/`:
 3. Cross-contract clients go in the new crate's `src/lib.rs` using `#[contractclient(name = "XClient")]`.
 4. Add CI checks: `cargo fmt`, `cargo clippy`, `cargo test` (the workspace already does this).
 5. Update the README contract matrix in this file.
+
+### Contract recipe checklist
+
+| Item                                              | ✓ |
+|---------------------------------------------------|---|
+| `Cargo.toml`: `soroban-sdk = { workspace = true }` |   |
+| `Cargo.toml`: `[lib] crate-type = ["lib","cdylib"]`|   |
+| `src/lib.rs`: module-level rustdoc on top         |   |
+| `src/types.rs`: typed `DataKey` enum with `#[contracttype]` |   |
+| `src/test.rs`: helper `setup()` that mocks auths  |   |
+| `tests/` folder empty or contains integration tests |   |
+| `README.md`: One-page Tour + Build section         |   |
 
 ## Style Guide
 
