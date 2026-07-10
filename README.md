@@ -112,6 +112,23 @@ stellar contract build --workspace
 
 Full testnet deployment walkthrough lives at [`DEPLOYMENT.md`](./DEPLOYMENT.md).
 
+### Clone-and-go deeper
+
+```bash
+# Run only one contract's tests
+cargo test -p reward-pool
+
+# Watch a build with the Workspace member filter
+cargo build --workspace --target wasm32v1-none --release
+
+# Regenerate client bindings (off-chain SDKs)
+stellar contract bindings typescript --wasm target/wasm32v1-none/release/course_registry.wasm \
+    --network testnet --output ./bindings/ts
+```
+
+A testnet faucet cheat-sheet and tip-tricks live at
+[`CONTRIBUTING.md` §Local Toolchain](./CONTRIBUTING.md#local-toolchain).
+
 ## Repository Layout
 
 ```text
