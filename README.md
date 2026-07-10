@@ -55,6 +55,33 @@ The result is a credential-and-bounty economy that pays learners for the things 
 | `governance`     | `GV`   | Badge-weighted proposal + voting + execution.                      |
 | `stake-vault`    | `SV`   | Time-locked stake → multi-tier quest multiplier (100 / 120 / 200). |
 
+> Each contract is independently deployable, has its own admin key, and exposes
+> an `upgrade_contract` WASM hook so the protocol can be patched without
+> touching peer contracts. See [`ARCHITECTURE.md`](./ARCHITECTURE.md).
+
+---
+
+## Protocol Overview
+
+```text
+        Learner off-chain              Operator / Indexer off-chain
+             │                                       │
+   ┌─────────┴─────────┐                ┌────────────┴────────────┐
+   │                   │                │                         │
+ enroll        submit_proof       verify_explore_quest    review_submission
+   │                   │                │                         │
+   ▼                   ▼                ▼                         ▼
+   course-registry  quest-engine  quest-engine  ────►  quest-engine
+        │  module N+1/N         │                │            │
+        ├─ mint badge           ├─ distribute    └──► reward-pool
+        └─ distribute 10 USDC   │     reward
+                                └─ fetch_get_multiplier
+                                      │
+                                      └─► stake-vault
+```
+
+**Read order**: [`ARCHITECTURE.md`](./ARCHITECTURE.md) → [`INTEGRATION.md`](./INTEGRATION.md) → [`DEPLOYMENT.md`](./DEPLOYMENT.md).
+
 ## Quickstart
 
 ```bash
