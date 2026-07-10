@@ -218,4 +218,16 @@ Released under the MIT License — see [`LICENSE`](./LICENSE).
 
 ---
 
+## Acknowledgements
+
+The KayStichs smart-contract workspace owes its clear separation of concerns and its emphasis on small, focused contracts to the broader Soroban community. In particular:
+
+- The **course-registry** / **reward-pool** / **badge-nft** triad was inspired by the credentialing patterns documented in the Soroban examples monorepo.
+- The **stake-vault** time-locked model was adapted from time-lock primitives used in live Soroban deployments.
+- The **governance** contract's badge-weighted voting borrows from the Soulbound-Token Voter Weight EIP work.
+
+We thank every open-source contributor who has filed an issue, opened a PR, or reported a security disclosure. The protocol grows stronger by the feedback loop.
+
+---
+
 *KayStichs is part of the broader KayStichs Protocol. If you ship integration code that uses these contracts, please add a link back to this repo in your docs.*
