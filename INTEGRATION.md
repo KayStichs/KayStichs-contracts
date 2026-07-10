@@ -141,6 +141,113 @@ governance    → admin: governance multisig
 
 `scripts/deploy.sh` automates this on Testnet.
 
+> **Hermetic test wiring** is identical except admins are random
+> `Address::generate(&env)` values in the unit tests — see
+> `contracts/*/test.rs`.
+
+---
+
+## Pattern F — TypeScript via @stellar/stellar-sdk
+
+A minimal subscribe-to-events harness:
+
+```typescript
+import { StellarRpc } from "@stellar/stellar-sdk";
+
+const rpc = new StellarRpc.Server("https://soroban-testnet.stellar.org");
+const cursor = "now";
+
+const events = await rpc.getEvents({
+  cursor,
+  topics: [["*", "module_completed"]],   // matches Course* / ModuleCompleted
+  limit: 50,
+});
+for (const ev of events.events!) {
+  console.log(ev.contractId, ev.topic, ev.value);
+}
+```
+
+For state reads (read-only Pattern A from above):
+
+```typescript
+const courseRegistry = new StellarSdk.Contract(courseRegistryId);
+call.course_registry.get_course({ id: 1 }, { simulate: true });
+```
+
+TypeScript bindings are produced by:
+
+```bash
+stellar contract bindings typescript \
+    --wasm contracts/target/wasm32v1-none/release/course_registry.wasm \
+    --network testnet \
+    --output ./bindings/ts
+```
+
+---
+
+## Pattern G — Rust via `soroban-sdk` Client
+
+For a Rust server-side indexer or backend:
+
+```rust,ignore
+use course_registry::CourseRegistryClient;
+use soroban_sdk::{Env, BytesN};
+
+let env = Env::default();
+let contract_id = BytesN::from_array(&env, &[0u8; 32]);
+let client = CourseRegistryClient::new(&env, &contract_id);
+
+let course = client.get_course(&1u32);
+println!("course metadata hash = {:?}", course.metadata_hash);
+```
+
+Async via `tokio`:
+
+```rust,ignore
+let rpc = soroban_client::Client::new("https://soroban-testnet.stellar.org").await?;
+let course = rpc.call(&course_registry_id, "get_course", vec![1u32.into()]).await?;
+```
+
+---
+
+## Pattern H — Python via `py-stellar-base`
+
+Useful for quick scripts and dashboards:
+
+```python
+from stellar_sdk import SorobanServer, scval
+
+server = SorobanServer("https://soroban-testnet.stellar.org")
+resp = server.simulate_transaction(
+    source=admin_pubkey,
+    contract_id=course_registry_id,
+    function_name="get_course",
+    parameters=[scval.to_uint32(1)],
+)
+print(resp.result)
+```
+
+---
+
+## Pattern I — Raw HTTP / curl
+
+For inspection when no SDK fits:
+
+```bash
+curl -sSf \
+    -d '{"jsonrpc":"2.0","id":0,"method":"getEvents","params":{
+        "startLedger":"latest",
+        "filters": [{
+            "contractIds":["'"$COURSE_REGISTRY"'"],
+            "topics":[["*","course_created"]]
+        }]
+    }}' \
+    -H "Content-Type: application/json" \
+    https://soroban-testnet.stellar.org | jq .
+```
+
+> Requires `jq` for pretty-printing.
+
 ---
 
 *Need help integrating? File a question in **Discussions** with the `integration` tag.*
