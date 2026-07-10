@@ -31,9 +31,25 @@
     "tests": "cargo test",
     "rebrand_verification": "scripts/verify-rebrand.sh"
   },
+  "scripts": {
+    "check_tools": "scripts/check-tools.sh",
+    "test": "scripts/test.sh",
+    "lint": "scripts/lint.sh",
+    "build": "scripts/build.sh",
+    "verify_rebrand": "scripts/verify-rebrand.sh"
+  },
+  "toolchain": {
+    "rustfmt_config": "rustfmt.toml",
+    "clippy_config": "clippy.toml"
+  },
   "brand_assets": {
     "primary_color": "#4F46E5",
     "accent_color": "#F43F5E",
     "primary_dark": "#1E1B4B"
+  },
+  "release": {
+    "playbook": "RELEASING.md",
+    "versioning": "semver 2.0.0",
+    "changelog_format": "keep-a-changelog 1.1.0"
   }
 }
