@@ -42,6 +42,16 @@ Traditional education credentials are paper-only, fragment across institutions, 
 
 The result is a credential-and-bounty economy that pays learners for the things they already want to learn.
 
+### Highlights
+
+- **6 contracts, ~5 Wasm artifacts**, each under **42 KiB** at the time of writing.
+- **Soroban SDK 23**, references resolved at the workspace level for clean upgrade paths.
+- **Zero off-chain dependencies** on the credential path — *everything* a learner needs
+  to prove completion is already on-chain.
+- **Observable via events**: every state change publishes an indexed event —
+  see [`ARCHITECTURE.md §Event Taxonomy`](./ARCHITECTURE.md#event-taxonomy).
+- **Auditable**: see [`course_completion_payout_audit.md`](./course_completion_payout_audit.md).
+
 ---
 
 ## What's Inside
