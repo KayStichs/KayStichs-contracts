@@ -1,3 +1,17 @@
+//! # `quest-engine` — B2B Bounties with Stake Multipliers
+//!
+//! `quest-engine` is the *marketplace layer* of the KayStichs Protocol.
+//! Employers create **build quests** (deliverables, peer-reviewed) by
+//! locking USDC into this contract; admins create **explore quests**
+//! (off-chain activities) that fund from the `reward-pool` on verification.
+//!
+//! On approval, payouts are scaled by the learner's `stake-vault`
+//! multiplier (100 / 120 / 200) and a 15 % protocol fee is routed to
+//! `reward-pool`.
+//!
+//! Two long-running flows: batch-approve (one tx, many learners) and
+//! approve-then-refund (cancel-on-no-submissions). Both are idempotent
+//! in the panic sense — see the `disputes` row of [`ARCHITECTURE.md`](../../../ARCHITECTURE.md).
 #![no_std]
 
 pub mod types;
