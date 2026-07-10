@@ -1,3 +1,22 @@
+//! # `governance` — Badge-Weighted DAO Proposals
+//!
+//! `governance` is the *deliberation layer* of the KayStichs Protocol.
+//! Learners cast votes on proposals and the weight of each vote is the
+//! learner's **badge count** — read via a cross-contract call into
+//! the `badge-nft` contract.
+//!
+//! The contract does **not** mutate protocol parameters; it accepts or
+//! rejects proposals and emits the `ProposalExecuted` /
+//! `ProposalCancelled` events that downstream operators watch.
+//!
+//! ## Design properties
+//!
+//! - **Strict majority.** Tied votes *reject* the proposal — no tie-breaker.
+//! - **Window-bound.** `cancel_proposal` and `execute_proposal` both
+//!   consult `env.ledger().timestamp()` to enforce temporal order.
+//! - **Idempotent on panic.** A revoked or re-executed proposal panics.
+//!
+//! See [`crate::types`] for [`Proposal`] and [`DataKey`](types::DataKey).
 #![no_std]
 use soroban_sdk::{
     contract, contractclient, contractevent, contractimpl, contracttype, symbol_short, Address,
