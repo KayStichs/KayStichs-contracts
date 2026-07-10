@@ -39,6 +39,15 @@ jobs:
       - name: Install Stellar CLI
         uses: stellar/stellar-cli@v23.0.1
 
+      - name: Bump transitive `ethnum` to a transmute-safe patch
+        # `ethnum = 1.5.2` (pulled transitively via `soroban-sdk = 23.5.2`)
+        # contains an incorrect `()` (0 bits) -> `TryFromIntError` (8 bits)
+        # transmute that newer `rustc` stable channels reject with `E0512`.
+        # Bumping to `1.5.3` (the upstream fix) unblocks `cargo clippy
+        # --all-targets --all-features -- -D warnings` on the workspace
+        # without forcing a `soroban-sdk` downgrade.
+        run: cargo update -p ethnum --precise 1.5.3
+
       - name: Check formatting
         run: cargo fmt --all -- --check
 
