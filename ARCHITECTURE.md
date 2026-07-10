@@ -119,4 +119,66 @@ Graceful degradation is preferred to silent failure wherever possible: the proto
 
 ---
 
+## Sequence: Course Completion → Badge → Reward
+
+```text
+verifier       course-registry         badge-nft       reward-pool
+  │                  │                       │               │
+  │ complete_module  │                       │               │
+  ├─────────────────►│                       │               │
+  │                  │ increment_progress    │               │
+  │                  │ ModuleCompleted event │               │
+  │                  │ (if final module)     │               │
+  │                  │ mint_badge            │               │
+  │                  ├──────────────────────►│               │
+  │                  │ (if RewardPool set)   │ BadgeMinted   │
+  │                  │ distribute_reward     ├──────────────►│
+  │                  ├─────────────────────────────────────►│
+  │                  │ CourseCompleted event │RewardDistributed
+  │ ◄────────────────┤                       │               │
+```
+
+A single `complete_module` call on the final module triggers **two** cross-contract hops.
+If either fails, the prior state is rolled back by the host VM — there is no scenario in
+which a learner obtains a *badge* but not a *reward* (or vice-versa) for the same completion.
+
+---
+
+## Sequence: Stake Multiplier on Quest Approval
+
+```text
+employer       quest-engine          stake-vault     reward-pool   learner
+  │                  │                    │               │           │
+  │ review_submission│                    │               │           │
+  ├─────────────────►│                    │               │           │
+  │                  │ get_multiplier     │               │           │
+  │                  ├──────────────────►│                │           │
+  │                  │◄──── 200 / 120 / 100                │           │
+  │                  │ compute amount    │               │           │
+  │                  │ + 15% protocol fee│               │           │
+  │                  ├─── transfer fee ──────────────────►│           │
+  │                  ├─── transfer boosted amount ────────────────────►│
+  │ ◄SubmissionReviewed event              │               │           │
+```
+
+The contract **caps** the boosted payout to the post-fee balance, by design: employers
+are expected to size bounties conservatively until the boost overflow rules are upgraded.
+
+---
+
+## Storage Cost Reference
+
+> All sizes are approximate and will tighten once tests pin concrete keys.
+
+| Contract         | Instance keys (init) | Persistent keys (per-record) | Hot path (read) |
+|------------------|---------------------|------------------------------|-----------------|
+| `course-registry`| 4                   | 1 per course + 1 per enrollment | `get_course`, `get_progress` |
+| `quest-engine`   | 5                   | 1 per quest + 1 per submission | `get_quest`, `get_submission` |
+| `reward-pool`    | 3                   | 1 per approved spender      | `distribute_reward` |
+| `badge-nft`      | 1                   | 1 vec per learner           | `get_badges`, `has_badge` |
+| `governance`     | 2                   | 1 per proposal + 1 per vote | `cast_vote`, `execute_proposal` |
+| `stake-vault`    | 2                   | 1 per staker                | `get_multiplier` |
+
+---
+
 *For deployment specifics, see [`DEPLOYMENT.md`](./DEPLOYMENT.md). For threat model, see [`SECURITY.md`](./SECURITY.md).*
