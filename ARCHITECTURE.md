@@ -12,6 +12,27 @@
 5. [Storage Model](#storage-model)
 6. [Event Taxonomy](#event-taxonomy)
 7. [Failure Modes & Defensive Calls](#failure-modes--defensive-calls)
+8. [Sequence: Course Completion → Badge → Reward](#sequence-course-completion--badge--reward)
+9. [Sequence: Stake Multiplier on Quest Approval](#sequence-stake-multiplier-on-quest-approval)
+10. [Storage Cost Reference](#storage-cost-reference)
+11. [Upgrade Mechanics](#upgrade-mechanics)
+12. [Error Reference](#error-reference)
+13. [Glossary](#glossary)
+
+---
+
+## Glossary
+
+| Term            | Definition                                                                       |
+|-----------------|----------------------------------------------------------------------------------|
+| **Learner**     | A Stellar account that earns badges and claims quest rewards.                    |
+| **Verifier**    | An authorized signer (typically the course admin) that bumps learner progress.   |
+| **Employer**    | A Stellar account that funds a build-quest escrow.                              |
+| **Soulbound**   | An NFT / badge that is *not transferable*. Once minted it stays with its learner.|
+| **Multiplier**  | Stake-tier reward boost: `100` (no stake), `120` (>= 100), `200` (>= 500).       |
+| **Pause**       | Admin-controlled circuit breaker that freezes distributions on a contract.        |
+| **Spender**     | A contract address whitelisted to call `reward_pool.distribute_reward`.           |
+| **QuestID**     | Monotonically increasing identifier scoped per `quest-engine` instance.          |
 
 ---
 
