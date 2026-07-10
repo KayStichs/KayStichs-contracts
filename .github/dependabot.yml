@@ -1,0 +1,56 @@
+version: 2
+
+# KayStichs contracts — Dependabot configuration.
+# We want to receive weekly PRs for:
+#   1) Direct production dependencies (cargo).
+#   2) GitHub Actions workflows (bump within patch).
+# We deliberately do NOT enable ecosystem-wide updates to avoid noise.
+
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/contracts"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "cargo"
+    groups:
+      soroban-sdk:
+        patterns:
+          - "soroban-sdk"
+        update-types:
+          - "minor"
+          - "patch"
+      # Reconcile SDK bumps as one PR; major bumps still allow individual PRs.
+      patch-and-minor:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Don't auto-bump workspace-level resolver.
+    ignore:
+      - dependency-name: "soroban-sdk"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:30"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    groups:
+      actions-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
