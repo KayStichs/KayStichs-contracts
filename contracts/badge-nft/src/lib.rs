@@ -1,3 +1,23 @@
+//! # `badge-nft` — Soulbound Course-Completion Badges
+//!
+//! `badge-nft` is the credentialing primitive of the KayStichs Protocol.
+//! It is invoked by [`course_registry::CourseRegistry::complete_module`]
+//! once a learner finishes the final module of a course. In response, this
+//! contract mints a **soulbound** `Badge` record into the learner's
+//! per-address `Vec<Badge>`.
+//!
+//! ## Design properties
+//!
+//! - **Non-transferable.** This contract exposes no transfer function;
+//!   ownership of a badge is fixed at mint time.
+//! - **Duplicate-protected.** A second mint for the same `(learner, course_id)`
+//!   panics with `"Badge for this course already exists"`.
+//! - **Vote weight.** [`governance::Governance::cast_vote`] uses
+//!   [`BadgeNFT::get_badges`] length as the voting weight.
+//!
+//! See [`crate::types`] for the [`Badge`](types::Badge) and
+//! [`DataKey`](types::DataKey) shapes. Per-process integration notes live
+//! under [`/contracts/badge-nft/README.md`](../README.md).
 #![no_std]
 use soroban_sdk::{contractclient, contractevent, Address, Env, Vec};
 
