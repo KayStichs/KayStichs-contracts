@@ -1,6 +1,6 @@
 # Course Registry Contract
 
-A Soroban smart contract for managing courses on the Learnault platform. This contract enables protocol admins to deactivate courses while preserving learner credentials.
+A Soroban smart contract for managing courses on the KayStichs platform. This contract enables protocol admins to deactivate courses while preserving learner credentials.
 
 ## Overview
 

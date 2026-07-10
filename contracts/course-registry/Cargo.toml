@@ -2,10 +2,10 @@
 name = "course-registry"
 version = "0.1.0"
 edition = "2021"
-authors = ["Learnault Team"]
-description = "Course registry contract for the Learnault platform"
+authors = ["KayStichs Team"]
+description = "Course registry contract for the KayStichs platform"
 license = "MIT"
-repository = "https://github.com/your-org/learnault-contracts"
+repository = "https://github.com/kaystichs/kaystichs-contracts"
 
 [lib]
 crate-type = ["lib", "cdylib"]
@@ -20,4 +20,3 @@ reward-pool = { path = "../reward-pool", default-features = false }
 soroban-sdk = { workspace = true, features = ["testutils"] }
 badge-nft = { path = "../badge-nft", features = ["testutils"] }
 reward-pool = { path = "../reward-pool", features = ["testutils"] }
-

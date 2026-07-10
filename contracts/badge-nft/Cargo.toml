@@ -2,10 +2,10 @@
 name = "badge-nft"
 version = "0.1.0"
 edition = "2021"
-authors = ["Learnault Team"]
-description = "Soulbound badge NFT contract for the Learnault platform"
+authors = ["KayStichs Team"]
+description = "Soulbound badge NFT contract for the KayStichs platform"
 license = "MIT"
-repository = "https://github.com/your-org/learnault-contracts"
+repository = "https://github.com/kaystichs/kaystichs-contracts"
 
 [lib]
 crate-type = ["lib", "cdylib"]

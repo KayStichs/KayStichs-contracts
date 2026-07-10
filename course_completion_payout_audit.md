@@ -1,6 +1,6 @@
 # Audit Report: Course Completion Payout Feature (Issue #53)
 
-This document presents the final audit of the smart contract changes implementing the automatic USDC reward payout upon course completion in the Learnault Protocol.
+This document presents the final audit of the smart contract changes implementing the automatic USDC reward payout upon course completion in the KayStichs Protocol.
 
 ---
 
@@ -8,9 +8,9 @@ This document presents the final audit of the smart contract changes implementin
 
 | Specification / Requirement | Implementation Detail | Status |
 | :--- | :--- | :--- |
-| **Automatic Reward Trigger** | Inside `complete_module` in [lib.rs](file:///c:/Users/Bamsy/learnault-contracts/contracts/course-registry/src/lib.rs), when `new_progress == course.total_modules`, a cross-contract call is made to the `RewardPool` contract. | **Active & Verified** |
-| **USDC Payout Amount** | The payout amount is configured as `10_0000000` (10 USDC, using the standard 7-decimal format for Stellar assets) in [lib.rs](file:///c:/Users/Bamsy/learnault-contracts/contracts/course-registry/src/lib.rs). | **Active & Verified** |
-| **Access Control (Admin)** | Only the Protocol Admin can set or update the `RewardPool` contract address via `set_reward_pool_address` in [lib.rs](file:///c:/Users/Bamsy/learnault-contracts/contracts/course-registry/src/lib.rs). | **Active & Verified** |
+| **Automatic Reward Trigger** | Inside `complete_module` in [lib.rs](https://github.com/kaystichs/kaystichs-contracts/blob/main/contracts/course-registry/src/lib.rs), when `new_progress == course.total_modules`, a cross-contract call is made to the `RewardPool` contract. | **Active & Verified** |
+| **USDC Payout Amount** | The payout amount is configured as `10_0000000` (10 USDC, using the standard 7-decimal format for Stellar assets) in [lib.rs](https://github.com/kaystichs/kaystichs-contracts/blob/main/contracts/course-registry/src/lib.rs). | **Active & Verified** |
+| **Access Control (Admin)** | Only the Protocol Admin can set or update the `RewardPool` contract address via `set_reward_pool_address` in [lib.rs](https://github.com/kaystichs/kaystichs-contracts/blob/main/contracts/course-registry/src/lib.rs). | **Active & Verified** |
 | **Access Control (Spender)** | The `RewardPool` contract verifies that the calling `CourseRegistry` contract is whitelisted as an approved spender before executing the transfer. | **Active & Verified** |
 | **Graceful Degradation** | If the `RewardPool` address is not configured, the module completion and badge minting still succeed without throwing an error. | **Active & Verified** |
 | **Event Logging** | The `CourseCompleted` event is published, logging the learner, course ID, and payout amount on-chain. | **Active & Verified** |
@@ -20,7 +20,7 @@ This document presents the final audit of the smart contract changes implementin
 ## 2. Code Architecture Review
 
 ### A. State Storage Configuration
-The configuration key is added to the `DataKey` enum in [types.rs](file:///c:/Users/Bamsy/learnault-contracts/contracts/course-registry/src/types.rs):
+The configuration key is added to the `DataKey` enum in [types.rs](https://github.com/kaystichs/kaystichs-contracts/blob/main/contracts/course-registry/src/types.rs):
 ```rust
 pub enum DataKey {
     Course(u32),
@@ -82,7 +82,7 @@ if new_progress == course.total_modules {
 
 ## 4. Testing & Verification
 
-The test suite in [test.rs](file:///c:/Users/Bamsy/learnault-contracts/contracts/course-registry/src/test.rs) includes five dedicated scenarios:
+The test suite in [test.rs](https://github.com/kaystichs/kaystichs-contracts/blob/main/contracts/course-registry/src/test.rs) includes five dedicated scenarios:
 
 1. **`test_complete_course_triggers_reward_distribution`**: Validates the complete happy path, verifying that both the badge and the 10 USDC reward are successfully distributed.
 2. **`test_reward_not_distributed_without_whitelist`**: Confirms that if the `CourseRegistry` is not whitelisted in the `RewardPool`, the transaction reverts with `"Caller is not an authorized spender"`.

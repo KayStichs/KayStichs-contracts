@@ -2,10 +2,10 @@
 name = "stake-vault"
 version = "0.1.0"
 edition = "2021"
-authors = ["Learnault Team"]
-description = "Stake vault contract for the Learnault platform"
+authors = ["KayStichs Team"]
+description = "Stake vault contract for the KayStichs platform"
 license = "MIT"
-repository = "https://github.com/learnault/learnault-contracts"
+repository = "https://github.com/kaystichs/kaystichs-contracts"
 
 [lib]
 crate-type = ["lib", "cdylib"]

@@ -2,10 +2,10 @@
 name = "reward-pool"
 version = "0.1.0"
 edition = "2021"
-authors = ["Learnault Team"]
-description = "Reward pool contract for the Learnault platform"
+authors = ["KayStichs Team"]
+description = "Reward pool contract for the KayStichs platform"
 license = "MIT"
-repository = "https://github.com/learnault/learnault-contracts"
+repository = "https://github.com/kaystichs/kaystichs-contracts"
 
 
 [lib]
