@@ -1,6 +1,9 @@
 # KayStichs Protocol — Smart Contracts
 
 > **The on-chain credential & micro-grant layer for the KayStichs Protocol.**
+>
+> A learner-owned credential + skill-to-bounty economy on Stellar:
+> **take a course → earn a soulbound badge → claim bounties with a staking multiplier**.
 
 [![Soroban SDK](https://img.shields.io/badge/soroban--sdk-23-4F46E5)](https://developers.stellar.org/docs/build/smart-contracts/)
 [![format](https://img.shields.io/badge/cargo--fmt-passing-22C55E)](#)
@@ -12,14 +15,32 @@ This workspace houses the six Soroban smart contracts that compose the **KayStic
 
 ## Table of Contents
 
-1. [What's Inside](#whats-inside)
-2. [Quickstart](#quickstart)
-3. [Repository Layout](#repository-layout)
-4. [Contract Matrix](#contract-matrix)
-5. [Build, Test, Lint](#build-test-lint)
-6. [Documentation Map](#documentation-map)
-7. [Contributing](#contributing)
-8. [License](#license)
+1. [Why KayStichs?](#why-kaystichs)
+2. [What's Inside](#whats-inside)
+3. [Protocol Overview](#protocol-overview)
+4. [Quickstart](#quickstart)
+5. [Repository Layout](#repository-layout)
+6. [Contract Matrix](#contract-matrix)
+7. [Build, Test, Lint](#build-test-lint)
+8. [Documentation Map](#documentation-map)
+9. [Typical User Journey](#typical-user-journey)
+10. [Contributing](#contributing)
+11. [License](#license)
+
+---
+
+## Why KayStichs?
+
+Traditional education credentials are paper-only, fragment across institutions, and never pay the learner back. KayStichs flips the model:
+
+- **Credentials live on-chain**, in a Stellar-native format that any app can verify.
+- **Badges are soulbound**: an earned badge can never be sold or transferred, so it
+  always represents *that learner's* achievement.
+- **Skill becomes liquid capital**: stake USDC to amplify quest rewards up to **2×**.
+- **Open governance**: badges act as voting weight, so credential holders steer the
+  protocol's future.
+
+The result is a credential-and-bounty economy that pays learners for the things they already want to learn.
 
 ---
 
