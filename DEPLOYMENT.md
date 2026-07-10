@@ -103,6 +103,36 @@ End-to-end happy-path check:
 ./scripts/smoke.sh     # not yet implemented — see ROADMAP
 ```
 
+A canonical smoke test does:
+
+1. `initialize` all six contracts on a fresh Testnet address.
+2. Wire cross-contract addresses (per *Address Wiring Cheat-sheet* in [`INTEGRATION.md`](./INTEGRATION.md)).
+3. Run a single course: `create_course → enroll → complete_module`.
+4. Run a single build quest: `create_build_quest → submit_proof → review_submission`.
+5. Confirm a single stake: `stake → assert get_multiplier == 200` (or tier chosen).
+6. Cleanup: `emergency_sweep` and remove test artifacts.
+
+> ⏱️ The reference smoke-script lives in [`scripts/`](./scripts).
+
+## Post-deploy Monitoring
+
+After a real Testnet / Futurenet deploy, schedule the following checks into
+an off-chain runner (cron / Kubernetes CronJob / Foundry):
+
+| Check                            | Cadence | What to look for                                   |
+|----------------------------------|---------|----------------------------------------------------|
+| `ContractUpgraded` events        | **alert on any** | Wasm drift is a security incident unless coordinated. |
+| `EmergencySweep` events          | alert on any | Sweeps should be rehearsed, not silent.        |
+| `RewardPool.distribute_reward` failure rate | 5 min | Failure spike == a downstream contract is mis-wired. |
+| `StakeVault.unstake` failure rate| 1 hour       | Failure spike == lock-period regression.            |
+| `ProposalExecuted` events       | daily summary | Completed proposals should map to off-chain `upgrade_contract` calls. |
+
+A minimal stack:
+
+- **Indexer**: a Soroban RPC `getEvents` poller indexed by `(contract_id, event_name)`.
+- **Storage**: flat files in `data/kaystichs-events/` for offline analysis.
+- **Notifier**: PagerDuty / Slack webhook for the alert rows above.
+
 ## Recovery Plan
 
 If the protocol is compromised:
