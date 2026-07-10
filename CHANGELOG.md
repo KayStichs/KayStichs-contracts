@@ -15,27 +15,48 @@
 
 ### Added
 
-_(none yet — opened with workspace bootstrap on 2026-07-10)_
+- **Per-contract READMEs** for `reward-pool`, `badge-nft`, `governance`,
+  `quest-engine`, `stake-vault`. Each is 90+ lines and aligns public API
+  with the actual `BytesN<32>`-based implementation.
+- **`course-registry` README realigned** with the current `BytesN<32>` API;
+  Symbol-based API example replaced with full-learner journey sample.
+- Drift source: this CHANGELOG now records commit-by-commit summaries so
+  release notes have a clean pre-canned input.
 
 ### Changed
 
-_(none yet)_
+- `README.md`: added Why KayStichs section, Highlights, Protocol Overview,
+  Repository-Layout script table, and Quickstart deeper workflow.
+- `ARCHITECTURE.md`: added sequence diagrams, storage cost reference,
+  upgrade mechanics, error reference, and a glossary; expanded ToC.
+- `CONTRIBUTING.md`: added reviewer OCR checklist, rustdoc minimum standard,
+  and contract recipe checklist.
+- `DEPLOYMENT.md`: added Smoke Tests detail and Post-deploy Monitoring section.
+- `INTEGRATION.md`: added Patterns F–I (TypeScript, Rust, Python, raw HTTP/curl).
+- `SECURITY.md`: added Contributor OCR checklist.
+- `FAQ.md`: added Integrations section with `getEvents` recipe.
+- `ROADMAP.md`: added Milestone Cadence and bucket-promotion discipline.
+- `RELEASING.md`: added Breaking-change discipline section.
+- `BRANDING.md`: added Usage Do/Don't table.
 
 ### Deprecated
 
-_(none yet)_
+_None._
 
 ### Removed
 
-_(none yet)_
+_None._
 
 ### Fixed
 
-_(none yet)_
+- **`course-registry/README.md` API drift** — replaced Symbol-shaped example
+  with `BytesN::from_array(&env, &[0u8; 32])`-shaped example to match current code.
 
 ### Security
 
-_(none yet)_
+- Documentation surface for emergency-sweep procedure reinforced
+  across `README.md`, `ARCHITECTURE.md`, and per-contract READMEs
+  (see `SECURITY.md` §Emergency Sweep).
 
 ## [1.0.0] — 2026-07-10
 
