@@ -1,15 +1,17 @@
-//! Storage and value shapes for the `course-registry` contract.
-//!
-//! ## Lifecycle of a `Course`
-//!
-//! 1. Admin calls [`crate::CourseRegistry::create_course`] → record is
-//!    stored under [`DataKey::Course`] keyed by an incrementing ID.
-//! 2. A learner enrolls → their progress is stored under
-//!    [`DataKey::Progress`].
-//! 3. Verifier calls [`crate::CourseRegistry::complete_module`] per module.
-//! 4. On `progress == total_modules`, the contract cross-calls the configured
-//!    badge NFT and reward pool addresses (see [`DataKey::BadgeNftAddress`]
-//!    and [`DataKey::RewardPoolAddress`]).
+// Storage and value shapes for the `course-registry` contract.
+//
+// ## Lifecycle of a `Course`
+//
+// 1. Admin calls `CourseRegistry::create_course` -> the record is stored
+//    under `DataKey::Course` keyed by an incrementing ID.
+// 2. A learner enrolls -> their progress is stored under `DataKey::Progress`.
+// 3. Verifier calls `CourseRegistry::complete_module` per module.
+// 4. On `progress == total_modules`, the contract cross-calls the configured
+//    badge-NFT and reward-pool addresses (see `DataKey::BadgeNftAddress` and
+//    `DataKey::RewardPoolAddress`).
+
+#![allow(clippy::doc_markdown)]
+
 use soroban_sdk::{contracttype, Address, BytesN};
 
 /// A single course as stored on-chain.

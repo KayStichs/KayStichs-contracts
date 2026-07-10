@@ -1,16 +1,19 @@
-//! Storage and value shapes for the `quest-engine` contract.
-//!
-//! ## Quest types
-//!
-//! | `QuestType` | Fund source        | Who approves  | Payout source         |
-//! |-------------|--------------------|---------------|------------------------|
-//! | `Build`     | `create_build_quest` (escrow in contract) | Employer | quest-engine -> learner with fee |
-//! | `Explore`   | `reward-pool` (cross-called at verify)  | Admin     | `reward-pool`         |
-//!
-//! ## Submission lifecycle
-//!
-//! `Pending` → `Approved` or `Rejected` on [`crate::QuestEngineContract::review_submission`].
-//! `Pending` → `Approved` on [`crate::QuestEngineContract::batch_review_submissions`].
+// Storage and value shapes for the `quest-engine` contract.
+//
+// ## Quest types
+//
+// | `QuestType` | Fund source                              | Who approves | Payout source                |
+// |-------------|------------------------------------------|--------------|-----------------------------|
+// | `Build`     | `create_build_quest` escrow in contract  | Employer     | quest-engine -> learner w/ fee |
+// | `Explore`   | reward-pool (cross-called at verify)     | Admin        | reward-pool                  |
+//
+// ## Submission lifecycle
+//
+// Pending -> Approved or Rejected on `QuestEngineContract::review_submission`.
+// Pending -> Approved on `QuestEngineContract::batch_review_submissions`.
+
+#![allow(clippy::doc_markdown)]
+
 use soroban_sdk::{contracttype, Address, BytesN};
 
 /// Enum of supported quest types. The discriminator is part of the ABI —

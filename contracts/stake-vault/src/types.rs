@@ -1,19 +1,22 @@
-//! Storage and value shapes for the `stake-vault` contract.
-//!
-//! ## Lock semantics
-//!
-//! The `lock_timestamp` field is **reset on every stake-write**. There is no
-//! `extend_lock` path, no `boost_lock`, no premature unstaking. This is by
-//! design — see [`crate::stake_vault::contract_impl::StakeVault::unstake`]
-//! for the failed-unstake panic message.
-//!
-//! ## Multiplier tiers
-//!
-//! | amount   | multiplier |
-//! |----------|------------|
-//! | `>=500`  | `200`      |
-//! | `>=100`  | `120`      |
-//! | `<100`   | `100`      |
+// Storage and value shapes for the `stake-vault` contract.
+//
+// ## Lock semantics
+//
+// The `lock_timestamp` field is **reset on every stake-write**. There is no
+// `extend_lock` path, no `boost_lock`, no premature unstaking. This is by
+// design — see `StakeVault::unstake` in `lib.rs` for the failed-unstake panic
+// message.
+//
+// ## Multiplier tiers
+//
+// | amount   | multiplier |
+// |----------|------------|
+// | >= 500   | 200        |
+// | >= 100   | 120        |
+// | <  100   | 100        |
+
+#![allow(clippy::doc_markdown)]
+
 use soroban_sdk::{contracttype, Address};
 
 /// Per-staker stake record.

@@ -1,14 +1,17 @@
-//! Storage and value shapes for the `badge-nft` contract.
-//!
-//! ## Soulbound semantics
-//!
-//! A [`crate::types::Badge`] is a small non-transferable record. Once minted,
-//! it stays in the learner's [`DataKey::UserBadges`] vector *forever* (or until
-//! [`crate::contract_impl::BadgeNFT::revoke_badge`] is called by the admin).
-//!
-//! The `Vec<Badge>` shape is canonical — the contract deliberately does NOT
-//! expose a `transfer` function, so the *physical* arrangement of records
-//! matches the *logical* ownership.
+// Storage and value shapes for the `badge-nft` contract.
+//
+// ## Soulbound semantics
+//
+// A `Badge` is a small non-transferable record. Once minted, it stays in the
+// learner's `UserBadges` vector *forever* (or until `revoke_badge` is called
+// by the admin).
+//
+// The `Vec<Badge>` shape is canonical — the contract deliberately does NOT
+// expose a `transfer` function, so the *physical* arrangement of records on
+// disk matches the *logical* ownership of badges in the world.
+
+#![allow(clippy::doc_markdown)]
+
 use soroban_sdk::{contracttype, Address};
 
 /// A single soulbound course-completion badge.
