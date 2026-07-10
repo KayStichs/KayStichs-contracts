@@ -1,26 +1,14 @@
 # `clippy` configuration for the KayStichs Protocol contracts workspace.
 #
-# These are **advisory** unless CI sets `RUSTFLAGS="-D warnings"`. The CI
-# runs `cargo clippy --all-targets --all-features -- -D warnings` already;
-# this file tightens a few project-specific lints so lint passes stay green.
+# **`clippy.toml` only accepts configuration variables** — lint-level
+# directives (`warn`, `deny`, `allow` on `clippy::*` or `arithmetic-overflow`
+# style names) belong in `Cargo.toml` under `[lint]` / `[lints]`. Putting
+# them here caused `cargo clippy --all-targets --all-features -- -D warnings`
+# in CI to die at parse time. Keep this file conservative.
 
-# Smart-contract friendly: prefer unfold over `?` would be too strict.
-# We deny the most-clearly-actionable lints:
+# Allow API-additive-only evolution across minor versions.
 avoid-breaking-exported-api = false
 
-# Numeric arithmetic is on i128: warn at suspicious magic thresholds.
-arithmetic-overflow        = "warn"
-integer-arithmetic         = "warn"
-
-# Soroban uses panics for control flow in some legacy specs — keep them visible.
-# (Default is `deny`, which is what we want.)
-missing-panics-doc         = "allow"
-
-# Encourage `todo!()` / `unimplemented!()` to be tracked.
-todo-unicode               = "warn"
-
-# Our function signatures use `BytesN<32>`; allow the longer-named reads.
-too-long-first-doc-paragraph = "allow"
-
-# Standard upper bound for "too_many_lines" — we hit it on a few contracts.
-too-many-lines-threshold    = 200
+# Tune clippy::too_many_lines threshold for Soroban contracts that have
+# several tightly-related `match` blocks in a single function.
+too-many-lines-threshold = 200
