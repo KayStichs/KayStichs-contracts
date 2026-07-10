@@ -1,3 +1,23 @@
+//! # `course-registry` — Course Catalog & Completion Trigger
+//!
+//! The registry is the source of truth for **courses** and **learner
+//! progress**. Each course has an instructor, a module count, an IPFS
+//! metadata hash, and a soft `active` flag that gates enrollments.
+//!
+//! Course completion is the canonical *happy path* of the protocol:
+//!
+//! 1. Learner calls [`CourseRegistry::enroll`].
+//! 2. Verifier (typically `admin`) calls [`CourseRegistry::complete_module`]
+//!    repeatedly per module.
+//! 3. On the final module, the registry **cross-calls**:
+//!    - [`badge_nft::BadgeNFTClient::mint_badge`] (if wired)
+//!    - [`reward_pool::RewardPoolClient::distribute_reward`] (if wired)
+//!
+//! Both cross-calls are *graceful*: their absence does NOT block the
+//! completion event — only the on-wiring swing.
+//!
+//! See [`crate::types`] for the [`Course`](types::Course) and
+//! [`DataKey`](types::DataKey) shapes.
 #![no_std]
 use soroban_sdk::{contract, contractevent, contractimpl, Address, BytesN, Env};
 
