@@ -1,0 +1,46 @@
+# CODEOWNERS — KayStichs Contracts
+#
+# This file drives GitHub's auto-assigned reviewer for PRs touching the matched paths.
+# Lines starting with `#` are comments. The LAST matching rule wins.
+#
+# Conventions:
+#   - Use GitHub handles (no @).
+#   - Order groups from most specific → least specific.
+#   - Keep this file alphabetical per area for easy maintenance.
+#
+
+# Default: core engineering team owns everything they touch.
+*                    @KayStichs/core-protocol
+
+# Brand & docs.
+/BRANDING.md         @KayStichs/core-protocol @KayStichs/brand
+/CHANGELOG.md        @KayStichs/core-protocol @KayStichs/release-managers
+/CONTRIBUTING.md     @KayStichs/core-protocol
+/README.md           @KayStichs/core-protocol
+/SECURITY.md         @KayStichs/security
+/INTEGRATION.md      @KayStichs/integrations
+/DEPLOYMENT.md       @KayStichs/operations @KayStichs/security
+/FAQ.md              @KayStichs/community
+/ROADMAP.md          @KayStichs/core-protocol
+/RELEASING.md        @KayStichs/release-managers
+/CODE_OF_CONDUCT.md  @KayStichs/community
+/wasm-info.json      @KayStichs/release-managers
+
+# Operational tooling.
+/scripts/            @KayStichs/operations
+/Makefile            @KayStichs/operations
+
+# GitHub policy templates.
+/.github/ISSUE_TEMPLATE/  @KayStichs/community
+/.github/PULL_REQUEST_TEMPLATE.md  @KayStichs/community
+/.github/CODEOWNERS       @KayStichs/core-protocol
+/.github/dependabot.yml  @KayStichs/operations
+/.github/workflows/       @KayStichs/core-protocol @KayStichs/operations
+
+# Per-contract ownership.
+/contracts/course-registry/  @KayStichs/core-protocol @KayStichs/integrations
+/contracts/badge-nft/        @KayStichs/core-protocol @KayStichs/integrations
+/contracts/reward-pool/      @KayStichs/core-protocol @KayStichs/operations
+/contracts/stake-vault/      @KayStichs/core-protocol @KayStichs/economics
+/contracts/quest-engine/     @KayStichs/core-protocol @KayStichs/integrations
+/contracts/governance/       @KayStichs/core-protocol @KayStichs/governance
