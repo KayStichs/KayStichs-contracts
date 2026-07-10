@@ -81,6 +81,16 @@ Use this when integrating KayStichs into a UI or off-chain backend:
 - [ ] Use the **`current_contract_address()`** of the caller in auth assertions, never its `Address` literal.
 - [ ] Reject integration if `get_admin()` returns a stale / unexpected admin address.
 
+### Contributor checklist (when writing new code)
+
+- [ ] **OCR**: Ownership / Cross-call / Reentrancy — see [`CONTRIBUTING.md` §Reviewer's checklist](./CONTRIBUTING.md#reviewers-checklist).
+- [ ] **Storage writes before external calls** — checks-effects-interactions pattern.
+- [ ] **Auth always calls `require_auth` before reading stored admin.**
+- [ ] **Magic numbers in `const` declarations**, not literal `123456789` sprinkles.
+- [ ] **Panic messages are human-readable** + namespaced (`"...: <context>"`).
+- [ ] **Events emitted AND topics chosen**, see [`ARCHITECTURE §Event Taxonomy`](./ARCHITECTURE.md#event-taxonomy).
+- [ ] **Test the negative path** — every `panic(... expected = "X")` test exists.
+
 ## Audits
 
 | Date         | Auditor    | Scope                              | Report                                                         |
