@@ -158,6 +158,15 @@ A testnet faucet cheat-sheet and tip-tricks live at
     └── stake-vault/
 ```
 
+### Top-level scripts
+
+| Script                    | Purpose                                            |
+|---------------------------|----------------------------------------------------|
+| `scripts/verify-rebrand.sh` | Confirms all brand tokens map to **KayStichs**. |
+
+> Additional convenience scripts (build / deploy / lint wrappers) ship in
+> [`scripts/`](./scripts) — keep them idempotent and offline-only.
+
 ## Contract Matrix
 
 | Contract         | Public fn count | Wasm target         | Storage model              |
