@@ -38,6 +38,19 @@ By participating you agree to:
 4. **Open the PR with the template.** The bot will auto-assign reviewers based on `.github/CODEOWNERS`.
 5. **Squash-merge** with a conventional-commit message at merge time. The bot will re-write your commit subject.
 
+### Reviewer's checklist
+
+Reviewers should run through this checklist before approval:
+
+- [ ] **API additive only** — no renames or removals on the contract surface.
+- [ ] **OCR (Ownership / Cross-call / Reentrancy)** — admin calls check `require_auth`,
+  cross-contract entrypoints use `current_contract_address()`, state writes precede external calls.
+- [ ] **Documentation** — public function has rustdoc; new events logged in `ARCHITECTURE.md`.
+- [ ] **Tests** — at least one positive and one negative test per new branch.
+- [ ] **CI green** — commits the conventional-prefix policy.
+
+If any item is unchecked, request changes — do not merge with TODO comments in code.
+
 ## Commit Conventions
 
 We use **Conventional Commits 1.0.0** with these prefixes:
